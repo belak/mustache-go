@@ -390,6 +390,28 @@ func TestSimpleDynamic(t *testing.T) {
 	}
 }
 
+func TestComplexDynamic(t *testing.T) {
+	tmpl := `{{hello.world}}{{something}}`
+	lookupFunc := func(name string) interface{} {
+		if name == "hello" {
+			return map[string]string{
+				"world": "some value",
+			}
+		}
+
+		return ""
+	}
+
+	output, err := Render(tmpl, lookupFunc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expect := "some value"
+	if output != expect {
+		t.Fatalf("TestLambda expected %q got %q", expect, output)
+	}
+}
+
 func TestLambda(t *testing.T) {
 	tmpl := `{{#lambda}}Hello {{name}}. {{#sub}}{{.}} {{/sub}}{{^negsub}}nothing{{/negsub}}{{/lambda}}`
 	data := map[string]interface{}{
